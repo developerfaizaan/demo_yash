@@ -13,16 +13,36 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling
+# Custom Styling for the Top Bar
 st.markdown("""
     <style>
-    .stSidebar {background-color: #f0f2f6;}
-    .stButton > button {background-color: #4CAF50; color: white;}
-    .header-icon {font-size: 36px; color: #4CAF50; margin-right: 10px;}
+    .top-bar { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        background-color: #f0f2f6; 
+        padding: 10px 20px; 
+        border-bottom: 1px solid #ccc;
+    }
+    .top-bar a { 
+        text-decoration: none; 
+        color: #4CAF50; 
+        font-weight: bold; 
+        margin-right: 20px;
+    }
+    .top-bar a:hover { color: #2e7d32; }
     </style>
 """, unsafe_allow_html=True)
 
-# Main Page Title with Icon
+# Adding a top bar with Login and Fork options
+st.markdown("""
+    <div class="top-bar">
+        <a href="/login" target="_self">🔒 Login</a>
+        <a href="https://github.com/your-repo-link" target="_blank">🍴 Fork</a>
+    </div>
+""", unsafe_allow_html=True)
+
+# Main Page Title
 st.markdown(
     '<h1>🤖 Object Detection and Tracking</h1>',
     unsafe_allow_html=True
