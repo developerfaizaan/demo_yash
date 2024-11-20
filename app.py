@@ -37,7 +37,7 @@ st.markdown("""
 # Adding a top bar with Login option
 st.markdown("""
     <div class="top-bar">
-        <a href="/login" target="_self">🔒 Login<https://peppy-meringue-6406b8.netlify.app/>
+        <a href="https://peppy-meringue-6406b8.netlify.app/" target="_self">🔒 Login</a>
     </div>
 """, unsafe_allow_html=True)
 
