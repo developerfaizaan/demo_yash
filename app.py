@@ -127,7 +127,7 @@ with col2:
                 # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
                 if object_counts:
-                    st.write("Here are the counts of detected objects:")
+                    st.write("**Counts of detected objects:**")
                     for label, count in object_counts.items():
                         st.write(f"- **{label.capitalize()}**: {count}")
                 else:
@@ -136,7 +136,7 @@ with col2:
                 # Display Detailed Results
                 with st.expander("📋 Detailed Detection Results"):
                     for box in boxes:
-                        st.write(box.data)
+                        st.write(box.data)  # Display raw detection data for each box
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
