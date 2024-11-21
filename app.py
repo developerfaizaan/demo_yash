@@ -1,6 +1,6 @@
 # Importing Required Libraries
 from pathlib import Path
-from PIL import Image, ImageEnhance
+from PIL import Image
 import streamlit as st
 import settings
 import helper
@@ -121,7 +121,7 @@ with col2:
                 # Categorize detected objects
                 object_counts = {}
                 for box in boxes:
-                    label = box.data[0].label  # Replace this with how your model provides labels
+                    label = box.label if hasattr(box, 'label') else "Unknown"  # Update based on your model's label format
                     object_counts[label] = object_counts.get(label, 0) + 1
 
                 # Display Detection Summary
