@@ -5,6 +5,14 @@ import streamlit as st
 import settings
 import helper
 
+# Function to Provide Default Caption for Unrecognized Objects
+def get_object_label(box):
+    """Get object label or default caption for unrecognized objects."""
+    if hasattr(box, 'label'):
+        return box.label
+    else:
+        return "Unidentified Object"
+
 # Setting Page Layout
 st.set_page_config(
     page_title="Object Detection 🤖",
@@ -121,8 +129,7 @@ with col2:
                 # Categorize detected objects
                 object_counts = {}
                 for box in boxes:
-                    # Extract label or set default as "Object"
-                    label = box.label if hasattr(box, 'label') and box.label else "Object"
+                    label = get_object_label(box)
                     object_counts[label] = object_counts.get(label, 0) + 1
 
                 # Display Detection Summary
@@ -137,7 +144,10 @@ with col2:
                 # Display Detailed Results
                 with st.expander("📋 Detailed Detection Results"):
                     for box in boxes:
-                        st.write(box.data)  # Display raw detection data for each box
+                        st.write({
+                            "Label": get_object_label(box),
+                            "Coordinates": box.data,
+                        })
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
