@@ -121,7 +121,7 @@ with col2:
                 # Categorize detected objects
                 object_counts = {}
                 for box in boxes:
-                    label = box.label if hasattr(box, 'label') else "Unknown"  # Update based on your model's label format
+                    label = getattr(box, 'label', 'Unlabeled Object')  # Extract label; fallback to 'Unlabeled Object' if not present
                     object_counts[label] = object_counts.get(label, 0) + 1
 
                 # Display Detection Summary
