@@ -118,12 +118,12 @@ with col2:
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
-            # Categorize detected objects
+                # Categorize detected objects
                 object_counts = {}
                 tensor_counts = {}  # For counting by tensor types
                 
                 for box in boxes:  # Loop through each detected box
-                    # st.write(f"Detected: {box}")  # Display the box details
+                    st.write(f"Detected: {box}")  # Display the box details
                     
                     # Extract label and tensor type
                     label = box.label if hasattr(box, 'label') else "Object in Image"
@@ -138,19 +138,30 @@ with col2:
                 # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
                 if object_counts:
-                    st.write("**Counts of detected objects:**")
+                    st.write("**Counts of detected objects by label:**")
                     for label, count in object_counts.items():
                         st.write(f"- **{label.capitalize()}**: {count}")
                 else:
                     st.write("No objects detected.")
 
+                # Display Tensor Counts
+                st.markdown("### Tensor Count Summary 🧮")
+                if tensor_counts:
+                    st.write("**Counts of detected objects by tensor type:**")
+                    for tensor_type, count in tensor_counts.items():
+                        st.write(f"- **Tensor {tensor_type}**: {count}")
+                else:
+                    st.write("No tensor types detected.")
+
                 # Display Detailed Results
                 with st.expander("📋 Detailed Detection Results"):
                     for box in boxes:
                         st.write(box.data)  # Display raw detection data for each box
+
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
+
 
 # Footer with Icons
 st.markdown("""
