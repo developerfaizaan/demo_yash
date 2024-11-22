@@ -120,7 +120,7 @@ with col2:
 
                 # Categorize detected objects
                 object_counts = {}
-                 st.write(f"Detected: {boxes}")
+                 st.write(f"Detected: {box}")
                 for box in boxes:
                   
                     label = box.label if hasattr(box, 'label') else "Object in Image"
