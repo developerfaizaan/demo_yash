@@ -120,13 +120,12 @@ with col2:
 
                               # Categorize detected objects
                # Categorize detected objects based on tensor value and count
-            tensor_counts = {}
-            for box in boxes:
-                # Get the tensor value of the class ID (e.g., tensor([0.]) or tensor([7.]))
-                tensor_value = box.cls[0].item()
-
-                # Use the tensor value as the key for counting occurrences
-                tensor_counts[tensor_value] = tensor_counts.get(tensor_value, 0) + 1
+             # Categorize detected objects
+                object_counts = {}
+                for box in boxes:
+                    print("hello {box}")
+                    label = box.label if hasattr(box, 'label') else "Object in Image"
+                    object_counts[label] = object_counts.get(label, 0) + 1
 
 
                 # Display Detection Summary
