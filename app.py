@@ -121,6 +121,7 @@ with col2:
                               # Categorize detected objects
                 object_counts = {}
                 for box in boxes:  # Loop starts here
+                       tensor_value = box.cls[0].item()
                     st.write(f"Detected: {box}")  # Properly aligned with the loop
                     label = box.label if hasattr(box, 'label') else "Object in Image"  # Consistent indentation
                     object_counts[label] = object_counts.get(label, 0) + 1  # Consistent indentation
