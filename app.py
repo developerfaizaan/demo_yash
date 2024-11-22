@@ -118,13 +118,22 @@ with col2:
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
-                              # Categorize detected objects
-                        # Categorize detected objects
+            # Categorize detected objects
                 object_counts = {}
-                for box in boxes:  # Loop starts here
-                    st.write(f"Detected: {box}")  # Properly aligned with the loop
-                    label = box.label if hasattr(box, 'label') else "Object in Image"  # Consistent indentation
-                    object_counts[label] = object_counts.get(label, 0) + 1  # Consistent indentation
+                tensor_counts = {}  # For counting by tensor types
+                
+                for box in boxes:  # Loop through each detected box
+                    st.write(f"Detected: {box}")  # Display the box details
+                    
+                    # Extract label and tensor type
+                    label = box.label if hasattr(box, 'label') else "Object in Image"
+                    tensor_type = int(box.cls[0])  # Extract tensor type as integer
+                    
+                    # Update object counts by label
+                    object_counts[label] = object_counts.get(label, 0) + 1
+                    
+                    # Update counts by tensor type
+                    tensor_counts[tensor_type] = tensor_counts.get(tensor_type, 0) + 1
 
                 # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
