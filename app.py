@@ -123,7 +123,8 @@ with col2:
                     0: "Person",
                     7: "Truck",
                     2: "car" ,
-                    63: "laptop"
+                    63: "laptop" ,
+                    3: "Bike"
                     
                 }
 
