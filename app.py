@@ -118,22 +118,31 @@ with col2:
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
+                # Define mapping for tensor types
+                tensor_type_mapping = {
+                    0: "Person",
+                    7: "Truck"
+                }
+
                 # Categorize detected objects
                 object_counts = {}
                 tensor_counts = {}  # For counting by tensor types
-                
+
                 for box in boxes:  # Loop through each detected box
                     st.write(f"Detected: {box}")  # Display the box details
-                    
+
                     # Extract label and tensor type
                     label = box.label if hasattr(box, 'label') else "Object in Image"
                     tensor_type = int(box.cls[0])  # Extract tensor type as integer
-                    
+
+                    # Map tensor type to a name if available
+                    tensor_name = tensor_type_mapping.get(tensor_type, f"Tensor {tensor_type}")
+
                     # Update object counts by label
                     object_counts[label] = object_counts.get(label, 0) + 1
-                    
-                    # Update counts by tensor type
-                    tensor_counts[tensor_type] = tensor_counts.get(tensor_type, 0) + 1
+
+                    # Update counts by tensor type (mapped name)
+                    tensor_counts[tensor_name] = tensor_counts.get(tensor_name, 0) + 1
 
                 # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
@@ -145,11 +154,11 @@ with col2:
                     st.write("No objects detected.")
 
                 # Display Tensor Counts
-                st.markdown("### Tensor Count Summary 🧮")
+                st.markdown("### Object Count Summary 🧮")
                 if tensor_counts:
-                    st.write("**Counts of detected objects by tensor type:**")
-                    for tensor_type, count in tensor_counts.items():
-                        st.write(f"- **Tensor {tensor_type}**: {count}")
+                    st.write("**Counts of detected objects by type:**")
+                    for tensor_name, count in tensor_counts.items():
+                        st.write(f"- **{tensor_name}**: {count}")
                 else:
                     st.write("No tensor types detected.")
 
@@ -161,8 +170,6 @@ with col2:
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
-
-
 # Footer with Icons
 st.markdown("""
     ---
