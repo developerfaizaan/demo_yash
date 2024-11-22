@@ -122,7 +122,7 @@ with col2:
                 tensor_type_mapping = {
                     0: "Person",
                     7: "Truck",
-                    66: "car"
+                    2: "car"
                     
                 }
 
