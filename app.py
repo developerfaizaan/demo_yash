@@ -119,22 +119,12 @@ with col2:
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
                               # Categorize detected objects
-               # Categorize detected objects based on tensor value and count
-            object_counts = {}
-            for box in boxes:
-                # Get the class ID of the object
-                class_id = int(box.cls[0].item())  # Extract the class ID from tensor
-
-                # Map the class ID to a label (e.g., 0 -> person, 7 -> car)
-                if class_id == 0:
-                    label = "person"
-                elif class_id == 7:
-                    label = "car"
-                else:
-                    label = f"Object {class_id}"  # Default label for unknown classes
-                
-                # Count similar objects (same class_id)
-                object_counts[label] = object_counts.get(label, 0) + 1
+                        # Categorize detected objects
+                object_counts = {}
+                for box in boxes:  # Loop starts here
+                    st.write(f"Detected: {box}")  # Properly aligned with the loop
+                    label = box.label if hasattr(box, 'label') else "Object in Image"  # Consistent indentation
+                    object_counts[label] = object_counts.get(label, 0) + 1  # Consistent indentation
 
                 # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
