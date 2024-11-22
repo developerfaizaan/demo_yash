@@ -118,13 +118,13 @@ with col2:
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
-                # Categorize detected objects
+                              # Categorize detected objects
                 object_counts = {}
-                 st.write(f"Detected: {box}")
-                for box in boxes:
-                  
-                    label = box.label if hasattr(box, 'label') else "Object in Image"
-                    object_counts[label] = object_counts.get(label, 0) + 1
+                for box in boxes:  # Loop starts here
+                    st.write(f"Detected: {box}")  # Properly aligned with the loop
+                    label = box.label if hasattr(box, 'label') else "Object in Image"  # Consistent indentation
+                    object_counts[label] = object_counts.get(label, 0) + 1  # Consistent indentation
+
 
                 # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
