@@ -129,7 +129,7 @@ with col2:
                 tensor_counts = {}  # For counting by tensor types
 
                 for box in boxes:  # Loop through each detected box
-                    st.write(f"Detected: {box}")  # Display the box details
+                    # st.write(f"Detected: {box}")  # Display the box details
 
                     # Extract label and tensor type
                     label = box.label if hasattr(box, 'label') else "Object in Image"
