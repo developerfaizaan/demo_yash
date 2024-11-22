@@ -121,7 +121,9 @@ with col2:
                 # Define mapping for tensor types
                 tensor_type_mapping = {
                     0: "Person",
-                    7: "Truck"
+                    7: "Truck",
+                    66: "car"
+                    
                 }
 
                 # Categorize detected objects
