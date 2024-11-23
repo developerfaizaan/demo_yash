@@ -124,7 +124,8 @@ with col2:
                     7: "Truck",
                     2: "car" ,
                     63: "laptop" ,
-                    3: "Bike"
+                    3: "Bike" ,
+                    41: "Cup"
                     
                 }
 
