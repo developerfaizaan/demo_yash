@@ -126,7 +126,8 @@ with col2:
                     63: "laptop" ,
                     3: "Bike" ,
                     41: "Cup" , 
-                    16: "dog"
+                    16: "dog" ,
+                    58: "potted plant"
                     
                 }
 
