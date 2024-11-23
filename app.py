@@ -183,7 +183,8 @@ if "logged_in" in st.session_state and st.session_state.logged_in:
                         41: "Cup",
                         16: "Dog",
                         58: "Potted Plant" ,
-                        56: "chair"
+                        56: "chair" , 
+                        59: "Bed"
                     }
 
                     # Categorize detected objects
