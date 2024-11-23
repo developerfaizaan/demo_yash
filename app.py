@@ -12,35 +12,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling for the Top Bar
-st.markdown("""
-    <style>
-    .top-bar { 
-        display: flex; 
-        justify-content: flex-start; 
-        align-items: center; 
-        background-color: #f0f2f6; 
-        padding: 10px 20px; 
-        border-bottom: 1px solid #ccc;
-    }
-    .top-bar a { 
-        text-decoration: none; 
-        color: #4CAF50; 
-        font-weight: bold; 
-        margin-right: 20px;
-    }
-    .top-bar a:hover { color: #2e7d32; }
-    </style>
-""", unsafe_allow_html=True)
+# Remove the old login and directly integrate the new demo login into the sidebar
 
-# Adding a top bar with Login option
-st.markdown("""
-    <div class="top-bar">
-        <a href="https://detectifilogin.netlify.app/" target="_self">🔒 Login</a>
-    </div>
-""", unsafe_allow_html=True)
-
-# Demo Login Section
+# Sidebar Demo Login Section
 st.sidebar.markdown('<h3>🔑 Demo Login</h3>', unsafe_allow_html=True)
 
 # User input for login
