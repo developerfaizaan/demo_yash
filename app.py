@@ -1,6 +1,6 @@
+import streamlit as st
 from pathlib import Path
 from PIL import Image, ImageEnhance
-import streamlit as st
 import settings
 import helper
 
@@ -12,32 +12,61 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Remove the old login and directly integrate the new demo login into the sidebar
+# Sidebar Login and Sign Up Section
+st.sidebar.markdown('<h3>🔑 Sign Up / Login</h3>', unsafe_allow_html=True)
 
-# Sidebar Demo Login Section
-st.sidebar.markdown('<h3>🔑 Demo Login</h3>', unsafe_allow_html=True)
+# Store users' credentials temporarily in session (for demo purposes)
+if "users" not in st.session_state:
+    st.session_state.users = {}
 
-# User input for login
-demo_username = st.sidebar.text_input("Username 👤:", "")
-demo_password = st.sidebar.text_input("Password 🔒:", type="password")
+# Toggle between Login and Sign Up
+auth_mode = st.sidebar.radio("Choose Action", ("Login", "Sign Up"))
 
-# Hardcoded credentials for the demo
-demo_credentials = {
-    "username": "demo_user",
-    "password": "demo_pass"
-}
+if auth_mode == "Sign Up":
+    # Sign Up Form
+    st.sidebar.markdown("### Create a new account 📋")
 
-# Check if the credentials match
-if demo_username == demo_credentials["username"] and demo_password == demo_credentials["password"]:
-    st.sidebar.success("✅ Login successful! Welcome to the demo.")
-    logged_in = True
-else:
-    if demo_username or demo_password:  # If either field is filled, show a warning
-        st.sidebar.warning("❌ Incorrect username or password. Please try again.")
-    logged_in = False
+    new_username = st.sidebar.text_input("Username 👤:")
+    new_password = st.sidebar.text_input("Password 🔒:", type="password")
+    confirm_password = st.sidebar.text_input("Confirm Password 🔒:", type="password")
 
-# Main page only accessible after successful login
-if logged_in:
+    # Check if Sign Up information is valid
+    if st.sidebar.button("Sign Up 📝"):
+        if new_username and new_password == confirm_password:
+            if new_username not in st.session_state.users:
+                st.session_state.users[new_username] = new_password
+                st.sidebar.success(f"Account created successfully for {new_username}! Please log in.")
+            else:
+                st.sidebar.warning("❌ Username already exists. Please try another.")
+        elif new_password != confirm_password:
+            st.sidebar.warning("❌ Passwords do not match. Please try again.")
+        else:
+            st.sidebar.warning("❌ Please fill all fields.")
+
+elif auth_mode == "Login":
+    # Login Form
+    st.sidebar.markdown("### Login to your account 🔑")
+
+    username = st.sidebar.text_input("Username 👤:")
+    password = st.sidebar.text_input("Password 🔒:", type="password")
+
+    demo_username = "demo_user"
+    demo_password = "demo_pass"
+
+    # Check Login Credentials
+    if st.sidebar.button("Login 🔑"):
+        if username == demo_username and password == demo_password:
+            st.session_state.logged_in = True
+            st.sidebar.success("✅ Login successful! Welcome to the demo.")
+        elif username in st.session_state.users and st.session_state.users[username] == password:
+            st.session_state.logged_in = True
+            st.sidebar.success(f"✅ Welcome back, {username}!")
+        else:
+            st.session_state.logged_in = False
+            st.sidebar.warning("❌ Incorrect username or password. Please try again.")
+
+# Main Page Only Accessible After Successful Login
+if "logged_in" in st.session_state and st.session_state.logged_in:
     # Main Page Title
     st.markdown('<h1>🤖 Object Detection and Tracking</h1>', unsafe_allow_html=True)
 
@@ -208,6 +237,7 @@ if logged_in:
             <p>🌟 Developed by <b>Your Name/Team</b> | Contact: <a href="mailto:your-email@example.com">your-email@example.com</a></p>
         </div>
     """, unsafe_allow_html=True)
+
 else:
     st.warning("⚠️ Please login to access the app.")
     st.stop()  # Prevent further execution if not logged in
