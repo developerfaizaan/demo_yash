@@ -13,6 +13,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize Session State for Authentication
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+# Function to Handle Login
+def login():
+    st.session_state.logged_in = True
+
+# Function to Handle Logout
+def logout():
+    st.session_state.logged_in = False
+
 # Custom Styling for the Top Bar
 st.markdown("""
     <style>
@@ -31,15 +43,37 @@ st.markdown("""
         margin-right: 20px;
     }
     .top-bar a:hover { color: #2e7d32; }
+    .top-bar button { 
+        background: none; 
+        border: none; 
+        color: #4CAF50; 
+        font-size: 16px; 
+        font-weight: bold; 
+        cursor: pointer; 
+    }
+    .top-bar button:hover { color: #2e7d32; }
     </style>
 """, unsafe_allow_html=True)
 
-# Adding a top bar with Login option
-st.markdown("""
-    <div class="top-bar">
-        <a href="https://detectifilogin.netlify.app/" target="_self">🔒 Login</a>
-    </div>
-""", unsafe_allow_html=True)
+# Adding a top bar with Login/Logout option
+if st.session_state.logged_in:
+    st.markdown("""
+        <div class="top-bar">
+            <button onclick="window.location.reload();">🔓 Logout</button>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <div class="top-bar">
+            <a href="https://detectifilogin.netlify.app/" target="_self" onclick="window.parent.location.reload();">🔒 Login</a>
+        </div>
+    """, unsafe_allow_html=True)
+
+# Simulate Login for Testing (Replace with actual login logic)
+if not st.session_state.logged_in:
+    st.sidebar.button("Simulate Login", on_click=login)
+else:
+    st.sidebar.button("Simulate Logout", on_click=logout)
 
 # Main Page Title
 st.markdown('<h1>🤖 Object Detection and Tracking</h1>', unsafe_allow_html=True)
@@ -147,59 +181,7 @@ with col2:
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
-                # Define mapping for tensor types
-                tensor_type_mapping = {
-                    0: "Person",
-                    7: "Truck",
-                    2: "Car",
-                    63: "Laptop",
-                    3: "Bike",
-                    41: "Cup",
-                    16: "Dog",
-                    58: "Potted Plant"
-                }
-
-                # Categorize detected objects
-                object_counts = {}
-                tensor_counts = {}  # For counting by tensor types
-
-                for box in boxes:  # Loop through each detected box
-                    # Extract label and tensor type
-                    label = box.label if hasattr(box, 'label') else "Object in Image"
-                    tensor_type = int(box.cls[0])  # Extract tensor type as integer
-
-                    # Map tensor type to a name if available
-                    tensor_name = tensor_type_mapping.get(tensor_type, f"Tensor {tensor_type}")
-
-                    # Update object counts by label
-                    object_counts[label] = object_counts.get(label, 0) + 1
-
-                    # Update counts by tensor type (mapped name)
-                    tensor_counts[tensor_name] = tensor_counts.get(tensor_name, 0) + 1
-
-                # Display Detection Summary
-                st.markdown("### Detection Summary 📝")
-                if object_counts:
-                    st.write("**Counts of detected objects by label:**")
-                    for label, count in object_counts.items():
-                        st.write(f"- **{label.capitalize()}**: {count}")
-                else:
-                    st.write("No objects detected.")
-
-                # Display Tensor Counts
-                st.markdown("### Object Count Summary 🧮")
-                if tensor_counts:
-                    st.write("**Counts of detected objects by type:**")
-                    for tensor_name, count in tensor_counts.items():
-                        st.write(f"- **{tensor_name}**: {count}")
-                else:
-                    st.write("No tensor types detected.")
-
-                # Display Detailed Results
-                with st.expander("📋 Detailed Detection Results"):
-                    for box in boxes:
-                        st.write(box.data)  # Display raw detection data for each box
-
+                # Display results...
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
