@@ -13,59 +13,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Manage login/logout state using st.session_state
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-
-# Function to handle logout
-def logout():
-    st.session_state.logged_in = False
-    st.experimental_set_query_params()  # Clear any login-related query parameters
-    st.experimental_rerun()
-
-# Check for login state in URL query parameters
-query_params = st.experimental_get_query_params()
-if "login_success" in query_params:
-    st.session_state.logged_in = True
-
 # Custom Styling for the Top Bar
 st.markdown("""
     <style>
     .top-bar { 
         display: flex; 
-        justify-content: space-between; 
+        justify-content: flex-start; 
         align-items: center; 
         background-color: #f0f2f6; 
         padding: 10px 20px; 
         border-bottom: 1px solid #ccc;
     }
-    .top-bar a, .top-bar button { 
+    .top-bar a { 
         text-decoration: none; 
         color: #4CAF50; 
         font-weight: bold; 
         margin-right: 20px;
-        border: none;
-        background: none;
-        cursor: pointer;
     }
-    .top-bar a:hover, .top-bar button:hover { color: #2e7d32; }
+    .top-bar a:hover { color: #2e7d32; }
     </style>
 """, unsafe_allow_html=True)
 
-# Top Bar: Login or Logout
-if st.session_state.logged_in:
-    st.markdown("""
-        <div class="top-bar">
-            <span>Welcome, User! 🎉</span>
-            <button onclick="window.location.href='/';">🔓 Logout</button>
-        </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-        <div class="top-bar">
-            <a href="https://detectifilogin.netlify.app/" target="_self">🔒 Login</a>
-        </div>
-    """, unsafe_allow_html=True)
+# Adding a top bar with Login option
+st.markdown("""
+    <div class="top-bar">
+        <a href="/login" target="_self">🔒 Login</a>
+    </div>
+""", unsafe_allow_html=True)
 
 # Main Page Title
 st.markdown('<h1>🤖 Object Detection and Tracking</h1>', unsafe_allow_html=True)
@@ -97,6 +71,7 @@ source_radio = st.sidebar.radio(
     help="Choose the source of the image or video for detection."
 )
 
+# Conditional Sidebar Inputs Based on Source
 source_img = None
 if source_radio == settings.IMAGE:
     source_img = st.sidebar.file_uploader(
@@ -107,8 +82,25 @@ if source_radio == settings.IMAGE:
 # Sidebar: Image Adjustment
 st.sidebar.markdown('<h3>🎨 Image Adjustments</h3>', unsafe_allow_html=True)
 
-contrast = st.sidebar.slider("Adjust Contrast 🌟:", 0.5, 3.0, 1.0, 0.1)
-brightness = st.sidebar.slider("Adjust Brightness 🌞:", 0.5, 3.0, 1.0, 0.1)
+# Contrast Slider
+contrast = st.sidebar.slider(
+    "Adjust Contrast 🌟:",
+    min_value=0.5,
+    max_value=3.0,
+    value=1.0,
+    step=0.1,
+    help="Increase or decrease the contrast of the uploaded image."
+)
+
+# Brightness Slider
+brightness = st.sidebar.slider(
+    "Adjust Brightness 🌞:",
+    min_value=0.5,
+    max_value=3.0,
+    value=1.0,
+    step=0.1,
+    help="Increase or decrease the brightness of the uploaded image."
+)
 
 # Load Pre-trained ML Model
 st.sidebar.markdown('<h3>🚀 Model Status</h3>', unsafe_allow_html=True)
@@ -130,9 +122,11 @@ with col1:
         try:
             uploaded_image = Image.open(source_img)
             
+            # Adjust Contrast
             enhancer_contrast = ImageEnhance.Contrast(uploaded_image)
             adjusted_image = enhancer_contrast.enhance(contrast)
             
+            # Adjust Brightness
             enhancer_brightness = ImageEnhance.Brightness(adjusted_image)
             adjusted_image = enhancer_brightness.enhance(brightness)
             
@@ -147,24 +141,70 @@ with col2:
     if source_img and st.button("Detect Objects 🔍"):
         with st.spinner("Detecting objects... 🛠️"):
             try:
+                # Perform detection using adjusted image
                 res = model.predict(adjusted_image, conf=confidence)
                 boxes = res[0].boxes
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
+                # Define mapping for tensor types
+                tensor_type_mapping = {
+                    0: "Person",
+                    7: "Truck",
+                    2: "Car",
+                    63: "Laptop",
+                    3: "Bike",
+                    41: "Cup",
+                    16: "Dog",
+                    58: "Potted Plant"
+                }
+
+                # Categorize detected objects
                 object_counts = {}
-                for box in boxes:
+                tensor_counts = {}  # For counting by tensor types
+
+                for box in boxes:  # Loop through each detected box
+                    # Extract label and tensor type
                     label = box.label if hasattr(box, 'label') else "Object in Image"
+                    tensor_type = int(box.cls[0])  # Extract tensor type as integer
+
+                    # Map tensor type to a name if available
+                    tensor_name = tensor_type_mapping.get(tensor_type, f"Tensor {tensor_type}")
+
+                    # Update object counts by label
                     object_counts[label] = object_counts.get(label, 0) + 1
 
+                    # Update counts by tensor type (mapped name)
+                    tensor_counts[tensor_name] = tensor_counts.get(tensor_name, 0) + 1
+
+                # Display Detection Summary
                 st.markdown("### Detection Summary 📝")
-                for label, count in object_counts.items():
-                    st.write(f"- **{label.capitalize()}**: {count}")
+                if object_counts:
+                    st.write("**Counts of detected objects by label:**")
+                    for label, count in object_counts.items():
+                        st.write(f"- **{label.capitalize()}**: {count}")
+                else:
+                    st.write("No objects detected.")
+
+                # Display Tensor Counts
+                st.markdown("### Object Count Summary 🧮")
+                if tensor_counts:
+                    st.write("**Counts of detected objects by type:**")
+                    for tensor_name, count in tensor_counts.items():
+                        st.write(f"- **{tensor_name}**: {count}")
+                else:
+                    st.write("No tensor types detected.")
+
+                # Display Detailed Results
+                with st.expander("📋 Detailed Detection Results"):
+                    for box in boxes:
+                        st.write(box.data)  # Display raw detection data for each box
+
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
 
-# Footer
+# Footer with Icons
 st.markdown("""
     ---
     <div style="text-align: center;">
