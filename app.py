@@ -13,67 +13,59 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize Session State for Authentication
+# Manage login/logout state using st.session_state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# Function to Handle Login
-def login():
-    st.session_state.logged_in = True
-
-# Function to Handle Logout
+# Function to handle logout
 def logout():
     st.session_state.logged_in = False
+    st.experimental_set_query_params()  # Clear any login-related query parameters
+    st.experimental_rerun()
+
+# Check for login state in URL query parameters
+query_params = st.experimental_get_query_params()
+if "login_success" in query_params:
+    st.session_state.logged_in = True
 
 # Custom Styling for the Top Bar
 st.markdown("""
     <style>
     .top-bar { 
         display: flex; 
-        justify-content: flex-start; 
+        justify-content: space-between; 
         align-items: center; 
         background-color: #f0f2f6; 
         padding: 10px 20px; 
         border-bottom: 1px solid #ccc;
     }
-    .top-bar a { 
+    .top-bar a, .top-bar button { 
         text-decoration: none; 
         color: #4CAF50; 
         font-weight: bold; 
         margin-right: 20px;
+        border: none;
+        background: none;
+        cursor: pointer;
     }
-    .top-bar a:hover { color: #2e7d32; }
-    .top-bar button { 
-        background: none; 
-        border: none; 
-        color: #4CAF50; 
-        font-size: 16px; 
-        font-weight: bold; 
-        cursor: pointer; 
-    }
-    .top-bar button:hover { color: #2e7d32; }
+    .top-bar a:hover, .top-bar button:hover { color: #2e7d32; }
     </style>
 """, unsafe_allow_html=True)
 
-# Adding a top bar with Login/Logout option
+# Top Bar: Login or Logout
 if st.session_state.logged_in:
     st.markdown("""
         <div class="top-bar">
-            <button onclick="window.location.reload();">🔓 Logout</button>
+            <span>Welcome, User! 🎉</span>
+            <button onclick="window.location.href='/';">🔓 Logout</button>
         </div>
     """, unsafe_allow_html=True)
 else:
     st.markdown("""
         <div class="top-bar">
-            <a href="https://detectifilogin.netlify.app/" target="_self" onclick="window.parent.location.reload();">🔒 Login</a>
+            <a href="https://detectifilogin.netlify.app/" target="_self">🔒 Login</a>
         </div>
     """, unsafe_allow_html=True)
-
-# Simulate Login for Testing (Replace with actual login logic)
-if not st.session_state.logged_in:
-    st.sidebar.button("Simulate Login", on_click=login)
-else:
-    st.sidebar.button("Simulate Logout", on_click=logout)
 
 # Main Page Title
 st.markdown('<h1>🤖 Object Detection and Tracking</h1>', unsafe_allow_html=True)
@@ -105,7 +97,6 @@ source_radio = st.sidebar.radio(
     help="Choose the source of the image or video for detection."
 )
 
-# Conditional Sidebar Inputs Based on Source
 source_img = None
 if source_radio == settings.IMAGE:
     source_img = st.sidebar.file_uploader(
@@ -116,25 +107,8 @@ if source_radio == settings.IMAGE:
 # Sidebar: Image Adjustment
 st.sidebar.markdown('<h3>🎨 Image Adjustments</h3>', unsafe_allow_html=True)
 
-# Contrast Slider
-contrast = st.sidebar.slider(
-    "Adjust Contrast 🌟:",
-    min_value=0.5,
-    max_value=3.0,
-    value=1.0,
-    step=0.1,
-    help="Increase or decrease the contrast of the uploaded image."
-)
-
-# Brightness Slider
-brightness = st.sidebar.slider(
-    "Adjust Brightness 🌞:",
-    min_value=0.5,
-    max_value=3.0,
-    value=1.0,
-    step=0.1,
-    help="Increase or decrease the brightness of the uploaded image."
-)
+contrast = st.sidebar.slider("Adjust Contrast 🌟:", 0.5, 3.0, 1.0, 0.1)
+brightness = st.sidebar.slider("Adjust Brightness 🌞:", 0.5, 3.0, 1.0, 0.1)
 
 # Load Pre-trained ML Model
 st.sidebar.markdown('<h3>🚀 Model Status</h3>', unsafe_allow_html=True)
@@ -156,11 +130,9 @@ with col1:
         try:
             uploaded_image = Image.open(source_img)
             
-            # Adjust Contrast
             enhancer_contrast = ImageEnhance.Contrast(uploaded_image)
             adjusted_image = enhancer_contrast.enhance(contrast)
             
-            # Adjust Brightness
             enhancer_brightness = ImageEnhance.Brightness(adjusted_image)
             adjusted_image = enhancer_brightness.enhance(brightness)
             
@@ -175,18 +147,24 @@ with col2:
     if source_img and st.button("Detect Objects 🔍"):
         with st.spinner("Detecting objects... 🛠️"):
             try:
-                # Perform detection using adjusted image
                 res = model.predict(adjusted_image, conf=confidence)
                 boxes = res[0].boxes
                 res_plotted = res[0].plot()[:, :, ::-1]
                 st.image(res_plotted, caption='Detected Image ✅', use_column_width=True)
 
-                # Display results...
+                object_counts = {}
+                for box in boxes:
+                    label = box.label if hasattr(box, 'label') else "Object in Image"
+                    object_counts[label] = object_counts.get(label, 0) + 1
+
+                st.markdown("### Detection Summary 📝")
+                for label, count in object_counts.items():
+                    st.write(f"- **{label.capitalize()}**: {count}")
             except Exception as ex:
                 st.error("❌ Error occurred during object detection.")
                 st.error(ex)
 
-# Footer with Icons
+# Footer
 st.markdown("""
     ---
     <div style="text-align: center;">
