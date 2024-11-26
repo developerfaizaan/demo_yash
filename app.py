@@ -1,4 +1,3 @@
-pip install -r requirements.txt
 # Importing Required Libraries
 from pathlib import Path
 from PIL import Image
